@@ -1,4 +1,5 @@
 import { createMMKV } from 'react-native-mmkv'
+import { Platform } from 'react-native';
 import { Skolengo as SkolengoSession } from "skolengojs";
 import { PersistStorage } from 'zustand/middleware'
 
@@ -10,7 +11,7 @@ classRegistry.set('Skolengo', SkolengoSession);
 export const createMMKVStorage = <T>(id: string, encryptionKey?: string): PersistStorage<T> => {
   const mmkv = createMMKV({
     id: id,
-    encryptionKey: encryptionKey
+    ...(encryptionKey && Platform.OS !== "web" ? { encryptionKey } : {}),
   });
 
   return {
