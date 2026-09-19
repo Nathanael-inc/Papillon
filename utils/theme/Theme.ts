@@ -3,7 +3,6 @@ import {
   DefaultTheme as NativeDefaultTheme,
 } from "expo-router/react-navigation";
 import { Platform } from "react-native";
-import { getDynamicColorScheme } from "react-native-dynamic-theme";
 
 const FALLBACK_COLORS = {
   light: {
@@ -29,9 +28,26 @@ const FALLBACK_COLORS = {
 const isMaterialYouAvailable =
   Platform.OS === "android" && typeof Platform.Version === "number" && Platform.Version >= 31;
 
+function getDynamicColorSchemeSafely() {
+  if (!isMaterialYouAvailable) {
+    return null;
+  }
+
+  try {
+    const { getDynamicColorScheme } = require("react-native-dynamic-theme");
+    return getDynamicColorScheme("#29947A");
+  } catch {
+    return null;
+  }
+}
+
 function getThemeColors(useMaterialYou: boolean) {
   if (useMaterialYou && isMaterialYouAvailable) {
-    const scheme = getDynamicColorScheme('#29947A');
+    const scheme = getDynamicColorSchemeSafely();
+    if (!scheme) {
+      return FALLBACK_COLORS;
+    }
+
     return {
       light: {
         primary: scheme.light.primary,
